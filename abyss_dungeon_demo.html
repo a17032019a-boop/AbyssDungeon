@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ABYSS DUNGEON</title>
+<style>
+:root{--bg:#090b11;--panel:#131722;--panel2:#1a2030;--line:#2a3244;--text:#e8eaf2;--muted:#9ba5ba;--gold:#d7ad5a;--red:#d45b64;--green:#6fc38a;--blue:#72a8ee}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#202638 0,#090b11 56%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+.wrap{max-width:1050px;margin:auto;padding:18px 14px 32px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding-bottom:14px}
+.brand{font-weight:900;letter-spacing:2px;font-size:21px}.brand span{color:var(--gold)}.tag{color:var(--muted);font-size:11px;letter-spacing:2px}
+.stats{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid var(--line);background:#10141e;border-radius:10px;padding:8px 10px;font-size:13px}
+.hero{margin:20px 0 16px;border:1px solid #30384b;border-radius:16px;padding:20px;background:linear-gradient(135deg,#252b3c,#11151f 70%);position:relative;overflow:hidden}
+.hero:after{content:"☠";position:absolute;right:16px;top:0;font-size:92px;color:#ffffff08}.hero h1{margin:0;font-size:25px;letter-spacing:1px}.hero p{color:var(--muted);margin:8px 0 0;font-size:14px}
+.grid{display:grid;grid-template-columns:1.3fr .9fr;gap:14px}.panel{background:linear-gradient(180deg,#151a26,#11151e);border:1px solid var(--line);border-radius:14px;padding:15px}.panel h2{font-size:15px;letter-spacing:1px;margin:0 0 12px}.bars{display:grid;gap:9px}.barrow{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}.bar{height:9px;flex:1;border-radius:20px;background:#252b39;overflow:hidden}.fill{height:100%;border-radius:20px;transition:width .25s}.hp{background:linear-gradient(90deg,#9e3544,#df6670)}.xp{background:linear-gradient(90deg,#4a71c2,#85b9ff)}.map{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.room{aspect-ratio:1;border-radius:9px;border:1px solid #30384b;background:#1b2130;color:#738096;display:grid;place-items:center;font-size:18px;cursor:pointer}.room.open{background:#262f40;color:#cbd4e5}.room.current{border-color:var(--gold);box-shadow:0 0 12px #d7ad5a28;color:var(--gold)}.room.boss{color:#e57b81}.room.locked{opacity:.35;cursor:not-allowed}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.btn{border:1px solid var(--line);border-radius:10px;background:#232b3b;color:var(--text);padding:11px;font-weight:700;cursor:pointer}.btn.primary{background:linear-gradient(135deg,#8a642b,#bd9045);border-color:#d3a85b;color:#17130c}.btn:active{transform:scale(.98)}.log{height:172px;overflow:auto;display:flex;flex-direction:column-reverse;gap:6px;font-size:12px;color:var(--muted)}.log div{padding:7px 9px;background:#0d1119;border-radius:7px}.lower{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.inventory{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.slot{background:#101520;border:1px solid var(--line);border-radius:9px;min-height:66px;display:grid;place-items:center;text-align:center;font-size:12px;color:var(--muted);padding:6px}.slot.filled{color:var(--text);border-color:#4a5267}.tabs{display:flex;gap:7px;margin:14px 0;overflow:auto}.tab{white-space:nowrap;border:1px solid var(--line);border-radius:9px;padding:9px 13px;background:#101520;color:var(--muted);cursor:pointer}.tab.active{color:var(--gold);border-color:#8d6d38;background:#241e14}.section{display:none}.section.active{display:block}.notice{color:var(--muted);font-size:12px;line-height:1.5}.foot{margin-top:20px;text-align:center;color:#657086;font-size:11px}
+@media(max-width:700px){.grid,.lower{grid-template-columns:1fr}.wrap{padding:12px}.top{align-items:flex-start;flex-direction:column}.hero h1{font-size:22px}.map{gap:5px}.room{font-size:16px}.inventory{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><div><div class="brand">ABYSS <span>DUNGEON</span></div><div class="tag">DARK FANTASY · DEMO 0.1</div></div>
+<div class="stats"><div class="chip">🪙 <b id="gold">50</b></div><div class="chip">⭐ LVL <b id="level">1</b></div></div></header>
+<div class="hero"><h1>ПЕПЕЛЬНЫЕ КАТАКОМБЫ</h1><p>Свет факела дрожит. Где-то в глубине слышится скрежет металла…</p></div>
+<div class="tabs"><button class="tab active" data-tab="dungeon">🏰 Подземелье</button><button class="tab" data-tab="character">👤 Персонаж</button><button class="tab" data-tab="bag">🎒 Инвентарь</button></div>
+<section id="dungeon" class="section active">
+<div class="grid">
+<div class="panel"><h2>КАРТА УРОВНЯ</h2><div class="map" id="map"></div><div class="actions"><button class="btn primary" id="explore">Исследовать комнату</button><button class="btn" id="rest">Передохнуть (+10 HP)</button></div></div>
+<div class="panel"><h2>СОСТОЯНИЕ</h2><div class="bars"><div class="barrow">❤️ <span id="hpText">100/100</span><div class="bar"><div id="hpBar" class="fill hp" style="width:100%"></div></div></div><div class="barrow">✨ <span id="xpText">0/100 XP</span><div class="bar"><div id="xpBar" class="fill xp" style="width:0%"></div></div></div></div><hr style="border-color:var(--line);margin:14px 0"><h2>ЖУРНАЛ</h2><div class="log" id="log"></div></div>
+</div>
+<div class="lower"><div class="panel"><h2>ПОСЛЕДНЯЯ НАХОДКА</h2><div id="loot" class="notice">Пока ничего. Исследуй комнаты, чтобы найти добычу.</div></div><div class="panel"><h2>ЦЕЛЬ</h2><div class="notice">Исследуй катакомбы, побеждай монстров, собирай золото и опыт. Найди комнату босса — если хватит сил.</div></div></div>
+</section>
+<section id="character" class="section"><div class="panel"><h2>ПЕРСОНАЖ</h2><div style="font-size:54px">🛡️</div><h3>Странник Бездны</h3><p class="notice">Класс: Воин · Уровень <span id="lvl2">1</span></p><div class="notice">Сила: 12 · Ловкость: 8 · Выносливость: 10</div><p class="notice">Побеждай врагов, чтобы получать XP и повышать уровень.</div></section>
+<section id="bag" class="section"><div class="panel"><h2>ИНВЕНТАРЬ</h2><div id="inventory" class="inventory"></div></div></section>
+<div class="foot">ABYSS DUNGEON · локальная демо-версия · прогресс сохраняется в браузере</div>
+</div>
+<script>
+const state=JSON.parse(localStorage.getItem("abyssSave")||"null")||{hp:100,xp:0,gold:50,level:1,rooms:[0],items:[],room:0};
+const roomTypes=["🕯️","👹","📦","🕯️","🔒","🦴","👹","📦","🕯️","🔒","🕯️","👹","🦴","👹","🔒","📦","🕯️","👹","🦴","👑"];
+const roomIcons=roomTypes.map((x,i)=>state.rooms.includes(i)?x:"·");
+const map=document.getElementById("map");
+function save(){localStorage.setItem("abyssSave",JSON.stringify(state));render()}
+function log(t){let el=document.createElement("div");el.textContent=t;document.getElementById("log").prepend(el)}
+function render(){document.getElementById("gold").textContent=state.gold;document.getElementById("level").textContent=state.level;document.getElementById("lvl2").textContent=state.level;document.getElementById("hpText").textContent=state.hp+"/100";document.getElementById("hpBar").style.width=state.hp+"%";document.getElementById("xpText").textContent=state.xp+"/100 XP";document.getElementById("xpBar").style.width=state.xp+"%";
+map.innerHTML="";roomTypes.forEach((icon,i)=>{let b=document.createElement("button");b.className="room "+(state.rooms.includes(i)?"open ":"locked ")+(state.room===i?"current ":"")+(i===19?"boss ":"");b.textContent=state.rooms.includes(i)?icon:"?";b.title="Комната "+(i+1);b.onclick=()=>{if(state.rooms.includes(i)){state.room=i;log("Ты вернулся в комнату "+(i+1));save()}};map.appendChild(b)});
+let inv=document.getElementById("inventory");inv.innerHTML="";for(let i=0;i<12;i++){let s=document.createElement("div");s.className="slot"+(state.items[i]?" filled":"");s.textContent=state.items[i]||"Пусто";inv.appendChild(s)}
+}
+function gainXP(n){state.xp+=n;if(state.xp>=100){state.xp-=100;state.level++;state.hp=100;state.gold+=25;log("🎉 Уровень повышен! Теперь уровень "+state.level+" (+25 золота)")}
+}
+const monsters=[["Крыса из тьмы",18,8],["Скелет-страж",24,12],["Падший культист",32,15],["Пустотный рыцарь",45,20]];
+document.getElementById("explore").onclick=()=>{let next=state.rooms.length;if(next>=20){log("Все комнаты исследованы. Катакомбы ждут нового забега.");return}let type=roomTypes[next];state.rooms.push(next);state.room=next;
+if(type==="👹"){let m=monsters[Math.floor(Math.random()*monsters.length)];let dmg=Math.floor(Math.random()*14)+8;state.hp=Math.max(0,state.hp-dmg);let xp=20+Math.floor(Math.random()*20),gold=8+Math.floor(Math.random()*20);gainXP(xp);state.gold+=gold;log("⚔️ "+m[0]+" атаковал! Ты победил. −"+dmg+" HP, +"+xp+" XP, +"+gold+" золота.");document.getElementById("loot").textContent="Победа над "+m[0]+": "+xp+" XP и "+gold+" золота.";
+}else if(type==="📦"){let loot=["Зелье здоровья","Ржавый кинжал","Кольцо пепла","Старый щит","Кристалл Бездны"];let item=loot[Math.floor(Math.random()*loot.length)];state.items.push(item);let gold=10+Math.floor(Math.random()*30);state.gold+=gold;log("📦 Сундук! "+item+" и "+gold+" золота.");document.getElementById("loot").textContent="Найдено: "+item+" · "+gold+" золота.";
+}else if(type==="👑"){log("👑 Ты достиг логова босса! Эта битва появится в следующем обновлении.");document.getElementById("loot").textContent="Логово босса открыто — впереди опасность.";
+}else{log("🕯️ Комната "+(next+1)+" исследована. В тишине слышен шёпот.");}
+if(state.hp<=0){state.hp=25;log("Ты потерял сознание и очнулся у входа. HP восстановлено до 25.");state.room=0}
+save()};
+document.getElementById("rest").onclick=()=>{let old=state.hp;state.hp=Math.min(100,state.hp+10);log("Ты передохнул: +"+(state.hp-old)+" HP.");save()};
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));t.classList.add("active");document.getElementById(t.dataset.tab).classList.add("active")});
+render();log("Ты вошёл в катакомбы. Выбери «Исследовать комнату».")
+</script>
+</body></html>
